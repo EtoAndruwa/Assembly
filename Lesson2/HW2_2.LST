@@ -1,0 +1,66 @@
+Turbo Assembler	 Version 4.1	    02/17/23 23:18:54	    Page 1
+hw2_2.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5	0100  BB B800		     Start:	     mov bx, 0b800h			     ; address of video	memmory	to the bx reg
+      6	0103  8E C3					     mov es, bx					     ; 0b800h to extra	    +
+      7				     segment
+      8	0105  33 DB					     xor bx, bx					     ; deletes the value    +
+      9				     from bx
+     10
+     11	0107  B9 07D0					     mov cx, 80*25			     ; total number of chars on	the +
+     12				     screen
+     13	010A  BA 4C41					     mov dx, 4c41h			     ; ASCII code of the char and   +
+     14				     its color to the reg dx
+     15
+     16	010D  26: 89 17		     ALL_COLOR:	     mov word ptr es:[bx], dx	     ; puts the	word with char ASCII code and its   +
+     17				     color to the video	memmory	stored in reg dx
+     18	0110  83 C3 02					     add bx, 2					     ; adds 2 bytes to the  +
+     19				     bx
+     20	0113  FE C6					     inc dh					     ; increases the value  +
+     21				     stored in dh (changes color and background)
+     22	0115  E2 F6					     loop ALL_COLOR			     ; loops
+     23
+     24	0117  B8 4C00					     mov ax, 4c00h			     ; Terminate program function   +
+     25				     code in reg ax
+     26	011A  CD 21					     int 21h					     ; Dos function call
+     27
+     28				     end		     Start
+Turbo Assembler	 Version 4.1	    02/17/23 23:18:54	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/23"
+??FILENAME			  Text	 "hw2_2	  "
+??TIME				  Text	 "23:18:54"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 HW2_2
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ALL_COLOR			  Near	 DGROUP:010D
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011C Word	  Public  CODE
+

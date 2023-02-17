@@ -1,0 +1,73 @@
+Turbo Assembler	 Version 4.1	    02/17/23 24:06:23	    Page 1
+hw2_3.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5
+      6	0100  BB B800		     Start:  mov bx, 0b800h			     ; address of video	memmory	to the bx reg
+      7	0103  8E C3				     mov es, bx					     ; 0b800h to extra segment
+      8	0105  33 DB				     xor bx, bx					     ; deletes the value from bx
+      9
+     10	0107  8A 0E 0080			     mov byte ptr cl, ds:[80h]	     ; number of elements in string from ds:[80h]   +
+     11				     stored in cl
+     12	010B  49				     dec cx
+     13	010C  B8 0000				     mov ax, 0d				     ; element index stored in ax
+     14	010F  B6 1F				     mov dh, 31d			     ; color and background code
+     15
+     16	0111  8B D8		     PRINT:  mov bx, ax				     ; element index from ax stored in bx reg
+     17	0113  8A 97 0082			     mov dl, [bx + 82h]			     ; char ASCII
+     18
+     19	0117  03 DB				     add bx, bx
+     20
+     21	0119  26: 89 97	0686			     mov word ptr es:[bx + 160 * 10 + 70], dx	     ; puts the	char to	the video   +
+     22				     memmory
+     23	011E  40			     inc ax						     ; increases the value stored in+
+     24				     ax
+     25
+     26	011F  80 C6 10				     add dh, 16
+     27	0122  80 E6 7F				     and dh, 01111111b
+     28	0125  E2 EA				     loop PRINT					     ; loops
+     29
+     30
+     31
+     32	0127  C3				     ret
+     33
+     34
+     35				     end    Start
+Turbo Assembler	 Version 4.1	    02/17/23 24:06:23	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/17/23"
+??FILENAME			  Text	 "hw2_3	  "
+??TIME				  Text	 "24:06:23"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 HW2_3
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+PRINT				  Near	 DGROUP:0111
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0128 Word	  Public  CODE
+

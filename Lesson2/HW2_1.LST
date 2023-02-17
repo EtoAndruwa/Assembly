@@ -1,0 +1,56 @@
+Turbo Assembler	 Version 4.1	    02/11/23 03:06:57	    Page 1
+hw2_1.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5
+      6	0100  BB B800		     Start:  mov bx, 0b800h
+      7	0103  8E C3			     mov es, bx
+      8	0105  33 DB			     xor bx, bx
+      9
+     10	0107  B9 07D0			     mov cx, 80*25
+     11	010A  26: C7 07	8C03	     BLINK:  mov word ptr es:[bx], 08c03h
+     12	010F  83 C3 02			     add bx, 2
+     13	0112  E2 F6			     loop BLINK
+     14
+     15	0114  B8 4C00			     mov ax, 4c00h
+     16	0117  CD 21			     int 21h
+     17
+     18				     end     Start
+Turbo Assembler	 Version 4.1	    02/11/23 03:06:57	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/11/23"
+??FILENAME			  Text	 "hw2_1	  "
+??TIME				  Text	 "03:06:57"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 HW2_1
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+BLINK				  Near	 DGROUP:010A
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0119 Word	  Public  CODE
+
