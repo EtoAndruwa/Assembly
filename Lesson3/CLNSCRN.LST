@@ -1,0 +1,78 @@
+Turbo Assembler	 Version 4.1	    02/18/23 01:49:50	    Page 1
+clnscrn.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5				     local @@
+      6
+      7	0100			     Start:
+      8	0100  E8 0001			       call ClrScrn		     ; cleans the screen
+      9	0103  C3			       ret
+     10
+     11				     ;-------------------------------------------------------------------------;
+     12				     ;ClrScrn								       ;
+     13				     ;-------------------------------------------------------------------------;
+     14				     ;Entry:	 es, cx, bx						       ;
+     15				     ;									       ;
+     16				     ;Exit:	 ----							       ;
+     17				     ;Expected:	 cx = number of	loops					       ;
+     18				     ;Destroys:	 es, bx, cx						       ;
+     19				     ;-------------------------------------------------------------------------;
+     20
+     21	0104			     ClrScrn   proc
+     22	0104  BB B800			       mov bx, 0b800h		     ; puts address of the video memmory to the	reg bx
+     23	0107  8E C3			       mov es, bx		     ; puts 0b800h as extra segment
+     24	0109  33 DB			       xor bx, bx		     ; deletes value form bx
+     25
+     26	010B  B9 07D0				   mov cx, 80*25		 ; counter = words on the screen
+     27	010E  26: C7 07	0003	     @@BLACK:  mov word	ptr es:[bx], 0003h   ; puts character to the [bx] position on the screen on +
+     28				     video memmory
+     29	0113  83 C3 02				   add bx, 2			 ; adds	2 bytes	to the memmory address
+     30	0116  E2 F6				   loop	@@BLACK			 ; loops
+     31
+     32	0118  33 DB			       xor bx, bx		     ; deletes value from bx
+     33	011A  33 C9			       xor cx, cx		     ; deletes value from cx
+     34
+     35	011C  C3			       ret			     ; exits from the function
+     36	011D				       endp
+     37
+     38				     end       Start
+Turbo Assembler	 Version 4.1	    02/18/23 01:49:50	    Page 2
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/18/23"
+??FILENAME			  Text	 "clnscrn "
+??TIME				  Text	 "01:49:50"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@				  Number [DGROUP:BP-0002]
+@@BLACK				  Near	 DGROUP:010E
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 CLNSCRN
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+CLRSCRN				  Near	 DGROUP:0104
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  011D Word	  Public  CODE
+

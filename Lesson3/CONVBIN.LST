@@ -1,0 +1,110 @@
+Turbo Assembler	 Version 4.1	    02/18/23 01:50:02	    Page 1
+convbin.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5				     local @@
+      6
+      7	0100			     Start:
+      8
+      9	0100  B8 03E8			     mov ax, 1000d		   ; entered number
+     10	0103  E8 0037			     call AddressVideo
+     11	0106  E8 0013			     call Con2bin
+     12	0109  E8 0039			     call MakeTabVideo
+     13	010C  B8 07D0			     mov ax, 2000d
+     14	010F  E8 000A			     call Con2bin
+     15	0112  E8 0030			     call MakeTabVideo
+     16	0115  B8 0014			     mov ax, 20d
+     17	0118  E8 0001			     call Con2bin
+     18	011B  C3			     ret
+     19
+     20	011C			     Con2bin	proc   ; converts into binary
+     21
+     22	011C  B9 0010				 mov cx, 16		       ; counter (8 bits)
+     23
+     24	011F			     @@PRINT:
+     25	011F  D1 E0			     shl ax, 1			   ; shift to left
+     26	0121  72 0F			     jc	@@ONE			     ; jmp if cf is 1
+     27	0123  73 03			     jnc @@ZERO			     ; jmp if cf is 0
+     28	0125			     @@OUT_PROG:
+     29	0125  E2 F8			     loop @@PRINT
+     30	0127  C3			     ret
+     31
+     32	0128  26: C7 07	4E30	     @@ZERO:   mov word	ptr es:[bx], 4e30h
+     33	012D  83 C3 02			     add bx, 2
+     34	0130  EB F3			     jmp @@OUT_PROG
+     35
+     36	0132  26: C7 07	4E31	     @@ONE:    mov word	ptr es:[bx], 4e31h
+     37	0137  83 C3 02			     add bx, 2
+     38	013A  EB E9			     jmp @@OUT_PROG
+     39
+     40	013C  C3			     ret
+     41	013D				     endp
+     42
+     43	013D			     AddressVideo  proc	    ; addresses	video memmory
+     44
+     45	013D  BB B800				     mov bx, 0b800h		   ;
+     46	0140  8E C3				     mov es, bx			   ;
+     47	0142  33 DB				     xor bx, bx			   ;
+     48
+     49	0144  C3				     ret
+     50	0145					     endp
+     51
+     52	0145			     MakeTabVideo proc	     ; makes tab in video memmory
+     53
+     54	0145  83 C3 08				  add bx, 8
+     55
+     56	0148  C3				  ret
+     57	0149					  endp
+Turbo Assembler	 Version 4.1	    02/18/23 01:50:02	    Page 2
+convbin.asm
+
+
+
+     58
+     59
+     60				     end Start
+Turbo Assembler	 Version 4.1	    02/18/23 01:50:02	    Page 3
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/18/23"
+??FILENAME			  Text	 "convbin "
+??TIME				  Text	 "01:50:02"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@				  Number [DGROUP:BP-0002]
+@@ONE				  Near	 DGROUP:0132
+@@OUT_PROG			  Near	 DGROUP:0125
+@@PRINT				  Near	 DGROUP:011F
+@@ZERO				  Near	 DGROUP:0128
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 CONVBIN
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ADDRESSVIDEO			  Near	 DGROUP:013D
+CON2BIN				  Near	 DGROUP:011C
+MAKETABVIDEO			  Near	 DGROUP:0145
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  0149 Word	  Public  CODE
+

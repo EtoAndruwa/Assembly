@@ -1,0 +1,274 @@
+Turbo Assembler	 Version 4.1	    02/18/23 01:52:14	    Page 1
+print_r.asm
+
+
+
+      1	0000			     .model tiny
+      2	0000			     .code
+      3				     org 100h
+      4
+      5				     local @@
+      6
+      7	0100  E8 0018		     Start:	     call ClrScrn		 ; clears the screen
+      8	0103  B8 0002				     mov ax, 2d			 ; coords y
+      9	0106  BB 000A				     mov bx, 10d		 ; coords x
+     10	0109  BD 003C				     mov  bp, 60d		 ; width
+     11	010C  BE 0015				     mov  si, 21d		 ; height
+     12	010F  E8 001A				     call PrintRamka		 ; prints frame	from coords (x,y) with height and   +
+     13				     width
+     14
+     15	0112  C3				     ret			 ; exits from program
+     16
+     17
+     18
+     19
+     20
+     21				     ;-------------------------------------------------------------------------;
+     22				     ;AddressVideo							       ;
+     23				     ;-------------------------------------------------------------------------;
+     24				     ;Entry:	 es, bx							       ;
+     25				     ;									       ;
+     26				     ;Exit:	 es = 0b800h						       ;
+     27				     ;Expected:	 video memmory addresing				       ;
+     28				     ;Destroys:	 es, bx							       ;
+     29				     ;-------------------------------------------------------------------------;
+     30	0113			     AddressVideo    proc			 ; addresses video memmory
+     31
+     32	0113  BB B800				     mov bx, 0b800h		 ; puts	to bx address of video memmory
+     33	0116  8E C3				     mov es, bx			 ; movs	bx's data to reg es
+     34	0118  33 DB				     xor bx, bx			 ; deletes value form bx
+     35
+     36	011A  C3				     ret
+     37	011B					     endp			 ; end of the function
+     38
+     39				     ;-------------------------------------------------------------------------;
+     40				     ;ClrScrn								       ;
+     41				     ;-------------------------------------------------------------------------;
+     42				     ;Entry:	 es, cx, bx						       ;
+     43				     ;									       ;
+     44				     ;Exit:	 ----							       ;
+     45				     ;Expected:	 cx = number of	loops					       ;
+     46				     ;Destroys:	 es, bx, cx						       ;
+     47				     ;-------------------------------------------------------------------------;
+     48
+     49	011B			     ClrScrn	     proc
+     50	011B  E8 FFF5				     call AddressVideo		 ; calls function which	puts to	reg es address of   +
+     51				     video memmory
+     52
+     53	011E  B9 07D0				     mov cx, 80	* 25		 ; counter = words on the screen
+     54
+     55	0121  26: C7 07	0003	     @@BLACK:	     mov word ptr es:[bx], 0003h ; puts	character to the [bx] position on the screen+
+     56				     on	video memmory
+     57	0126  83 C3 02					 add bx, 2		     ; increases bx to 2 bytes
+Turbo Assembler	 Version 4.1	    02/18/23 01:52:14	    Page 2
+print_r.asm
+
+
+
+     58	0129  E2 F6					 loop @@BLACK		     ; loops BLACK
+     59
+     60	012B  C3				     ret
+     61	012C					     endp			 ; end of the function
+     62
+     63				     ;-------------------------------------------------------------------------;
+     64				     ;PrintRamka							       ;
+     65				     ;-------------------------------------------------------------------------;
+     66				     ;Entry:	cx, si							       ;
+     67				     ;									       ;
+     68				     ;Exit:	------							       ;
+     69				     ;Expected:	printed	frame on new coords				       ;
+     70				     ;Destroys:	cx							       ;
+     71				     ;-------------------------------------------------------------------------;
+     72	012C			     PrintRamka	     proc
+     73	012C  E8 0072				     call GetNewCoords		 ; puts	the memmory address in se in the right place+
+     74				     according to the new coords
+     75	012F  E8 002D				     call PrintTop		 ; prints the top part of the frame
+     76
+     77	0132  8B CE				     mov cx, si			 ; puts	number of lines	into counter
+     78	0134  49				     dec cx			 ;
+     79	0135  49				     dec cx			 ; makes cx - 2(without	top and	bottom parts)
+     80
+     81	0136  E8 0006		     @@PrintAllVer:  call PrintVer		 ; prints the central parts of the frame
+     82	0139  E2 FB				     loop @@PrintAllVer		 ; loops
+     83
+     84	013B  E8 0045				     call PrintBot		 ; prints the bottom part of the frame
+     85
+     86	013E  C3				     ret
+     87	013F					     endp			 ; end of the function
+     88
+     89				     ;-------------------------------------------------------------------------;
+     90				     ;PrintVer								       ;
+     91				     ;-------------------------------------------------------------------------;
+     92				     ;Entry:	di, bx,	bp, ax,	cx					       ;
+     93				     ;									       ;
+     94				     ;Exit:	--------						       ;
+     95				     ;Expected:	printed	central	part of	the frame			       ;
+     96				     ;Destroys:	di, ax,	cx, bx						       ;
+     97				     ;-------------------------------------------------------------------------;
+     98	013F			     PrintVer	     proc
+     99
+    100	013F  8B FB				     mov di, bx			 ; stores entering memmory address
+    101	0141  8B C5				     mov ax, bp			 ; puts	width into reg ax
+    102	0143  48				     dec ax			 ;
+    103
+    104	0144  55				     push bp			 ; saves value of bp reg to the	stack
+    105	0145  BD 0002				     mov bp, 2			 ; puts	multipler in bp
+    106	0148  F7 E5				     mul bp			 ; ax now contains 2 * width
+    107	014A  5D				     pop bp			 ; gets	the bp reg value from the stack
+    108
+    109	014B  26: C7 07	4EC3			     mov word ptr es:[bx], 4ec3h ; prints right	bracket
+    110
+    111	0150  03 D8				     add bx, ax			 ; shifts the memmory
+    112
+    113	0152  26: C7 07	4EB4			     mov word ptr es:[bx], 4eb4h ; prints left bracket
+    114
+Turbo Assembler	 Version 4.1	    02/18/23 01:52:14	    Page 3
+print_r.asm
+
+
+
+    115	0157  BB 00A0				     mov bx, 160		 ; shift to the	next line from entering	memmory	    +
+    116				     address
+    117	015A  03 FB				     add di, bx			 ; sum of entering + shift
+    118	015C  87 FB				     xchg di, bx		 ; result now in bx
+    119
+    120	015E  C3				     ret
+    121	015F					     endp			 ; end of the function
+    122
+    123				     ;-------------------------------------------------------------------------;
+    124				     ;PrintTop								       ;
+    125				     ;-------------------------------------------------------------------------;
+    126				     ;Entry:	ax, bx,	cx, bp						       ;
+    127				     ;									       ;
+    128				     ;Exit:	---------						       ;
+    129				     ;Expected:	printed	top part of the	frame				       ;
+    130				     ;Destroys:	ax, cx,	bx						       ;
+    131				     ;-------------------------------------------------------------------------;
+    132	015F			     PrintTop	     proc
+    133
+    134	015F  8B C3				     mov ax, bx			 ; stores entering memmory address
+    135	0161  8B CD				     mov cx, bp			 ; puts	width to the counter
+    136	0163  49				     dec cx			 ;
+    137	0164  49				     dec cx			 ; makes cx - 2(angles)
+    138
+    139	0165  26: C7 07	4EDA			     mov word ptr es:[bx], 4edah ; prints left top edge	of the frame
+    140	016A  83 C3 02				     add bx, 2			 ; shifts to the next memmory cell
+    141
+    142	016D  26: C7 07	4EC2	     @@Print_line:   mov word ptr es:[bx], 4ec2h ; prints top central edge of the frame
+    143	0172  83 C3 02				     add bx, 2			 ; shifts to the next memmory cell
+    144	0175  E2 F6				     loop @@Print_line		 ; loops
+    145
+    146	0177  26: C7 07	4EBF			     mov word ptr es:[bx], 4ebfh ; prints top right edge of the	frame
+    147
+    148	017C  BB 00A0				     mov bx, 160		 ; shift to the	next line from entering	memmory	    +
+    149				     address
+    150	017F  03 C3				     add ax, bx			 ; sum of entering + shift
+    151	0181  93				     xchg ax, bx		 ; result now in bx
+    152
+    153	0182  C3				     ret
+    154	0183					     endp			 ; end of the function
+    155
+    156				     ;-------------------------------------------------------------------------;
+    157				     ;PrintBot								       ;
+    158				     ;-------------------------------------------------------------------------;
+    159				     ;Entry:	ax, bx,	bp, cx						       ;
+    160				     ;									       ;
+    161				     ;Exit:	---------						       ;
+    162				     ;Expected:	printed	bottom part of the frame			       ;
+    163				     ;Destroys:	ax, cx,	bx						       ;
+    164				     ;-------------------------------------------------------------------------;
+    165	0183			     PrintBot	     proc
+    166
+    167	0183  8B C3				     mov ax, bx			 ; stores entering memmory address
+    168	0185  8B CD				     mov cx, bp			 ; puts	width to the counter
+    169	0187  49				     dec cx			 ;
+    170	0188  49				     dec cx			 ; makes cx - 2(angles)
+    171
+Turbo Assembler	 Version 4.1	    02/18/23 01:52:14	    Page 4
+print_r.asm
+
+
+
+    172	0189  26: C7 07	4EC0			     mov word ptr es:[bx], 4ec0h ; prints left bottom edge of the frame
+    173	018E  83 C3 02				     add bx, 2			 ; shifts to the next memmory cell
+    174
+    175	0191  26: C7 07	4EC1	     @@Print_line2:  mov word ptr es:[bx], 4ec1h ; prints bottom central edge of the frame
+    176	0196  83 C3 02				     add bx, 2			 ; shifts to the next memmory cell
+    177	0199  E2 F6				     loop @@Print_line2		 ; loops
+    178
+    179	019B  26: C7 07	4ED9			     mov word ptr es:[bx], 4ed9h ; prints bottom right edge of the frame
+    180
+    181	01A0  C3				     ret
+    182	01A1					     endp			 ; end of the function
+    183
+    184
+    185				     ;-------------------------------------------------------------------------;
+    186				     ;GetNewCoords							       ;
+    187				     ;-------------------------------------------------------------------------;
+    188				     ;Entry:	 di, ax, bx						       ;
+    189				     ;									       ;
+    190				     ;Exit:	 bx = the start	in video memmory			       ;
+    191				     ;Expected:	 -----							       ;
+    192				     ;Destroys:	 ax, bx, di						       ;
+    193				     ;-------------------------------------------------------------------------;
+    194	01A1			     GetNewCoords    proc
+    195
+    196	01A1  BF 00A0				     mov di, 160     ; moves to	the reg	di width of one	line
+    197	01A4  F7 E7				     mul di	     ; multiples by the	y coords in ax
+    198
+    199	01A6  BF 0002				     mov di, 2	     ; 2 bytes multipler for x-coords
+    200	01A9  93				     xchg ax, bx     ; y-coords	* multipler right now in bx (ax<->bx)
+    201	01AA  F7 E7				     mul di	     ; ax contains x-coords * multipler
+    202
+    203	01AC  03 C3				     add ax, bx	     ; adds the	x-coords * multipler coords to the y-coords *	    +
+    204				     multipler coords (resul in	ax)
+    205	01AE  93				     xchg ax, bx     ; changes values ax<->bx (result in bx)
+    206
+    207	01AF  C3				     ret	     ; exits from function
+    208	01B0					     endp
+    209
+    210				     end	     Start
+Turbo Assembler	 Version 4.1	    02/18/23 01:52:14	    Page 5
+Symbol Table
+
+
+
+
+Symbol Name			  Type	 Value
+
+??DATE				  Text	 "02/18/23"
+??FILENAME			  Text	 "print_r "
+??TIME				  Text	 "01:52:14"
+??VERSION			  Number 040A
+@32BIT				  Text	 0
+@@				  Number [DGROUP:BP-0002]
+@@BLACK				  Near	 DGROUP:0121
+@@PRINTALLVER			  Near	 DGROUP:0136
+@@PRINT_LINE			  Near	 DGROUP:016D
+@@PRINT_LINE2			  Near	 DGROUP:0191
+@CODE				  Text	 DGROUP
+@CODESIZE			  Text	 0
+@CPU				  Text	 0101H
+@CURSEG				  Text	 _TEXT
+@DATA				  Text	 DGROUP
+@DATASIZE			  Text	 0
+@FILENAME			  Text	 PRINT_R
+@INTERFACE			  Text	 000H
+@MODEL				  Text	 1
+@STACK				  Text	 DGROUP
+@WORDSIZE			  Text	 2
+ADDRESSVIDEO			  Near	 DGROUP:0113
+CLRSCRN				  Near	 DGROUP:011B
+GETNEWCOORDS			  Near	 DGROUP:01A1
+PRINTBOT			  Near	 DGROUP:0183
+PRINTRAMKA			  Near	 DGROUP:012C
+PRINTTOP			  Near	 DGROUP:015F
+PRINTVER			  Near	 DGROUP:013F
+START				  Near	 DGROUP:0100
+
+Groups & Segments		  Bit Size Align  Combine Class
+
+DGROUP				  Group
+  _DATA				  16  0000 Word	  Public  DATA
+  _TEXT				  16  01B0 Word	  Public  CODE
+
